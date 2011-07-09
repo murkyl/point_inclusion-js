@@ -25,10 +25,9 @@ Checks if a point is within the bounds of the shape define by the area_obj param
 
 +y+: Y coordinate of the test point
 
-+area_obj+: A Javascript object of the following format: {shape: "", coords: []}.  The shape must be one of the
-valid shapes defined below.  The coords array is an array of floats representing the geometric shape.  The format
-of the coords array will depend on the type of shape being tested and is defined in the section below detailing the
-valid shapes.
++area_obj+: A Javascript object of the format {shape: "", coords: []}.  The shape must be one of the valid shapes
+defined below.  The coords array is an array of floats representing the geometric shape.  The format of the coords array
+ will depend on the type of shape being tested and is defined in the section below detailing the valid shapes.
 
 
 *Return values*
