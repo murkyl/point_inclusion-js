@@ -1,0 +1,231 @@
+3B-point_inclusion.js
+=====================
+:Author: Andrew Chung, 3Bengals Inc.
+:Email: Andrew Chung <andrew.chung@3bengals.com>
+:Date: 2011-07-09
+:Revision: 1.0.0
+
+This library provides a small set of functions which will determine if a given point is within the bounds or inside
+various geometric shapes.  These shapes include a rectangle, a circle and a polygon of arbitrary sides.
+
+
+== Functions
+=== check
+----
+check(x, y, area_obj)
+----
+*Description*
+
+Checks if a point is within the bounds of the shape define by the area_obj parameter.
+
+
+*Arguments*
+
++x+: X coordinate of the test point
+
++y+: Y coordinate of the test point
+
++area_obj+: A Javascript object of the following format: {shape: \'\', coords: []}.  The shape must be one of the
+valid shapes defined below.  The coords array is an array of floats representing the geometric shape.  The format
+of the coords array will depend on the type of shape being tested and is defined in the section below detailing the
+valid shapes.
+
+
+*Return values*
+
+A boolean of true if the point is within the shape and false otherwise.
+
+
+*Example*
+----
+threeB.point_inclusion.check(50, 100, {shape: \'circle\', coords: [40, 40, 50]});
+----
+
+
+
+=== check_array
+----
+check_array(x, y, area_obj_array)
+----
+*Description*
+
+Checks for point inclusion in each of the shapes in the area_obj_array parameter by repeatedly calling the \'check\'
+function on behalf of the user.  This check will terminate as soon as an object that contains the point is found so for
+performance reasons, ordering the array with the largest or most likely hit areas will save on testing.
+
+
+*Arguments*
+
++x+: X coordinate of the test point
+
++y+: Y coordinate of the test point
+
++area_obj_obj+: An array of area_obj objects as defined by the option in the \'check\' function.
+
+
+*Return values*
+
+A boolean of true if the point is within any one of the shapes and false otherwise.
+
+
+*Example*
+----
+var shapes = [
+{shape: 'rectangle', coords: [0, 40, 90, 200]},
+{shape: 'circle', coords: [40, 40, 50]},
+{shape: 'poly', vertx: [20, 50, 60, 40, 30], verty: [20, 40, 70, 120, 30]}
+];
+
+var shapes2 = [
+{shape: 'rectangle', coords: [0, 40, 90, 200]},
+{shape: 'circle', coords: [40, 40, 50]},
+{shape: 'poly', coords: [20, 40, 50, 40, 60, 70, 40, 120, 30, 30]}
+];
+
+threeB.point_inclusion.check(50, 100, shapes);
+
+threeB.point_inclusion.check(50, 100, shapes2);
+
+// Both check will produce the same results for all shapes.
+----
+
+
+
+=== check_rectangle
+----
+check_rectangle(x, y, coords)
+----
+*Description*
+
+Checks to see if a point is within the rectangle defined by the coords parameter.
+
+
+*Arguments*
+
++x+: X coordinate of the test point
+
++y+: Y coordinate of the test point
+
++coords+: An array of floats that defines the shape of the rectangle.  The format of this array is: [x1, y1, x2, y2]
+where x1, y1 represents the upper left corner of the rectangle and x2, y2 represents the lower right corner of the
+rectangle.
+
+
+*Return values*
+
+A boolean of true if the point is within the shape and false otherwise.
+
+
+*Example*
+----
+threeB.point_inclusion.check_rectangle(50, 100, [0, 40, 90, 200]);
+----
+
+
+
+=== check_circle
+----
+check_circle(x, y, coords, bbox)
+----
+*Description*
+
+Checks to see if a point is within the circle defined by the coords parameter.
+
+
+*Arguments*
+
++x+: X coordinate of the test point
+
++y+: Y coordinate of the test point
+
++coords+: An array of floats that defines the shape of the circle.  The format of this array is: [x, y, radius].  The
+x, y coordinates define the center of the circle while the radius parameter defines the radius of the circle.
+
++bbox+: An optional parameter which the library uses to speed up hit testing.  This bbox parameter should be an array
+of floats with the same format as would be given to the check_rectangle function.  If present, the library will first
+check if the point is within the bounding box before performing a more detailed check against the circle in question.
+
+
+*Return values*
+
+A boolean of true if the point is within the shape and false otherwise.
+
+
+*Example*
+----
+threeB.point_inclusion.check_circle(50, 100, [40, 40, 50]);
+----
+
+
+
+=== check_poly
+----
+check_poly(x, y, vertx, verty, bbox)
+----
+*Description*
+
+Checks to see if a point is within the polygon defined by the vertices given by the arrays vertx and verty.
+
+
+*Arguments*
+
++x+: X coordinate of the test point
+
++y+: Y coordinate of the test point
+
++vertx and verty+: Two arrays of floats that defines the shape of the polygon.  A polygon is defined by a set of x, y
+points representing the vertices of the polygon.  It is assumed that the last vertex connects with the first vertex.
+There should always be an even number of x,y pairs meaning the length of the vertx and verty arrays should be the same.
+The format of the vertx and verty arrays is: [x1, x2, x3, x4, ...] [y1, y2, y3, y4, ...].
+
++bbox+: An optional parameter which the library uses to speed up hit testing.  This bbox parameter should be an array
+of floats with the same format as would be given to the check_rectangle function.  If present, the library will first
+check if the point is within the bounding box before performing a more detailed check against the polygon in question.
+
+
+*Return values*
+
+A boolean of true if the point is within the shape and false otherwise.
+
+
+*Example*
+----
+----
+
+
+
+== Shapes and shape definitions
+The shape key can be one of the following shapes:
+
+* rect
+* circle
+* poly
+
+Each shape has a different format required for specifying the format.  The format for each shape is outlined below.
+
+=== rect
+The format of this shape is a single coords array: [x1, y1, x2, y2] where x1, y1 represents the upper left corner of the
+rectangle and x2, y2 represents the lower right corner of the rectangle.
+
+=== circle
+The format of this shape is a single coords array: [x, y, radius].  The x, y coordinates define the center of the circle
+while the radius parameter defines the radius of the circle.  An option key of 'bbox' is allowed to help speed up the
+hit test on a circle.  The format of this 'bbox' parameter is identical to the coords array used by the 'rect' shape.
+
+=== poly
+Two arrays of floats define the shape of the polygon.  A polygon is defined by a set of x, y points representing the
+vertices of the polygon.  It is assumed that the last vertex connects with the first vertex.
+
+There should always be an even number of x,y pairs meaning the length of the vertx and verty arrays should be the same.
+The format of the vertx and verty arrays is: [x1, x2, x3, x4, ...] [y1, y2, y3, y4, ...].
+
+The 'check' function will accept 2 forms of vertex information.  The first is the one described above using the two
+vertx and verty keys in the area_obj.  The second form is a single array similar to the coords array used by the 'rect'
+shape.  In this case the single array must contain both the x and y values in the form: [x1, y1, x2, y2, x3, y3, ...].
+
+Internally the check function will convert the single coords array into a vertx and verty array in order to speed up
+the polygon hit test.
+
+An option key of 'bbox' is allowed to help speed up the hit test on a polygon.  The format of this 'bbox' parameter is
+identical to the coords array used by the 'rect' shape.  Providing a 'bbox' parameter is HIGHLY recommended in order to
+improve performance when testing against a polygon.
